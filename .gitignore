@@ -1,0 +1,7 @@
+# Virtual Environment
+venv/
+
+# Python Package
+dist/
+*.egg-info/
+
