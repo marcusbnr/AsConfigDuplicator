@@ -72,6 +72,13 @@ def main():
         # Cpu.pkg
 
     shutil.copy2(OldConfigPath + "/Config.pkg", NewConfigPath)    
+    shutil.copy2(OldConfigPath + "/Hardware.hw", NewConfigPath)  
+    shutil.copy2(OldConfigPath + "/Hardware.hwl", NewConfigPath)  
+    shutil.copy2(OldConfigPath + "/Hardware.jpg", NewConfigPath)  
+
+    # For the Cpu.pkg file, we need the folder directly inside the config folder
+    ProcessorFolderPath = next(os.walk(OldConfigPath))[1][0]
+    shutil.copy2(OldConfigPath + '/' +ProcessorFolderPath + "/Cpu.pkg", NewConfigPath + '/' + ProcessorFolderPath)  
 
     # Create reference files for each configuration file by modifying .pkg files
 
