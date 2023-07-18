@@ -48,7 +48,7 @@ def main():
     print("Creating new Automation Studio Configuration at: ", NewConfigPath, "\n")
     os.mkdir(NewConfigPath)
 
-    # Copy directories only
+    # Copy directories and pkg files only
     for (Root, Dirs, Files) in os.walk(OldConfigPath):
         for Dir in Dirs:
             DirPath = ""
@@ -58,11 +58,19 @@ def main():
 
             if not DirPath:
                 PathToCreate = (NewConfigPath + '/' + Dir)
+                OldPath = (OldConfigPath + '/' + Dir)
             else:
                 PathToCreate = (NewConfigPath + DirPath + '/' + Dir)
+                OldPath = (OldConfigPath + DirPath + '/' + Dir)
 
             PathToCreate = PathToCreate.replace('\\', '/')
+            OldPath = OldPath.replace('\\', '/')
+
             os.mkdir(PathToCreate)
+
+            for File in Files:
+                if(File == "Package.pkg"):
+                    shutil.copy2(OldPath + "/Package.pkg", PathToCreate)   
 
     # Copy files which cannot be referenced:
         # Config.pkg
@@ -79,6 +87,8 @@ def main():
     # For the Cpu.pkg file, we need the folder directly inside the config folder
     ProcessorFolderPath = next(os.walk(OldConfigPath))[1][0]
     shutil.copy2(OldConfigPath + '/' +ProcessorFolderPath + "/Cpu.pkg", NewConfigPath + '/' + ProcessorFolderPath)  
+
+    # Modify Cpu.pkg file to reference CPU files
 
     # Create reference files for each configuration file by modifying .pkg files
 
