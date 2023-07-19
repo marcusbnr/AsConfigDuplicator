@@ -13,7 +13,19 @@ import shutil
 
 ######## Declare Functions ########
 
+# This funcntion reads a Package.pkg file and turns every "File" entry to a Reference entry
+# Requires: The path to the pkg file, the name of the AS Configuration to Reference, the name of the processor folder in the Physical view
+# Modifies: Rewrites the pkg file
+# Returns: Nothing
+def AddReferencesToPkg(FilePath, OldConfigName, ProcessorFolderName):
+    with open(FilePath, 'r') as File:
+        FileData = File.read()
 
+    FileData = FileData.replace("Type=\"File\">", "Type=\"File\" Reference=\"true\">\\Physical\\" + OldConfigName + '\\' + ProcessorFolderName + "\\")
+
+    with open(FilePath, 'w') as File:
+        FileData = File.write(FileData)
+    return      
 
 ######## Main ########
 
@@ -51,26 +63,17 @@ def main():
     # Copy directories and pkg files only
     for (Root, Dirs, Files) in os.walk(OldConfigPath):
         for Dir in Dirs:
-            DirPath = ""
-            SplitString = Root.split(OldConfigPath)
-            for Element in SplitString:
-                DirPath += Element;
+            OldDirPath = Root + '/' + Dir
+            OldDirPath = OldDirPath.replace('\\', '/')
+            NewDirPath = OldDirPath.replace(ConfigToDuplicate, NewConfigName)
+            os.mkdir(NewDirPath)
 
-            if not DirPath:
-                PathToCreate = (NewConfigPath + '/' + Dir)
-                OldPath = (OldConfigPath + '/' + Dir)
-            else:
-                PathToCreate = (NewConfigPath + DirPath + '/' + Dir)
-                OldPath = (OldConfigPath + DirPath + '/' + Dir)
-
-            PathToCreate = PathToCreate.replace('\\', '/')
-            OldPath = OldPath.replace('\\', '/')
-
-            os.mkdir(PathToCreate)
-
-            for File in Files:
-                if(File == "Package.pkg"):
-                    shutil.copy2(OldPath + "/Package.pkg", PathToCreate)   
+        for File in Files:
+            if(File == "Package.pkg"):
+                OldFilePath = Root + '/' + File
+                NewFilePath = OldFilePath.replace(ConfigToDuplicate, NewConfigName)
+                NewFilePath = NewFilePath.replace('\\', '/')
+                shutil.copy2(OldFilePath, NewFilePath)   
 
     # Copy files which cannot be referenced:
         # Config.pkg
@@ -86,11 +89,26 @@ def main():
 
     # For the Cpu.pkg file, we need the folder directly inside the config folder
     ProcessorFolderPath = next(os.walk(OldConfigPath))[1][0]
-    shutil.copy2(OldConfigPath + '/' +ProcessorFolderPath + "/Cpu.pkg", NewConfigPath + '/' + ProcessorFolderPath)  
+    shutil.copy2(OldConfigPath + '/' + ProcessorFolderPath + "/Cpu.pkg", NewConfigPath + '/' + ProcessorFolderPath)  
 
     # Modify Cpu.pkg file to reference CPU files
+    CpuPkgFilePath = NewConfigPath + '/' + ProcessorFolderPath + "/Cpu.pkg"
+    with open(CpuPkgFilePath, 'r') as File:
+        FileData = File.read()
+
+    FileData = FileData.replace(">Cpu.sw"," Reference=\"true\">" + '\\Physical\\' + ConfigToDuplicate + '\\' + ProcessorFolderPath + "\Cpu.sw")
+    FileData = FileData.replace(">Cpu.per"," Reference=\"true\">" + '\\Physical\\' + ConfigToDuplicate + '\\' + ProcessorFolderPath + "\Cpu.per")
+    FileData = FileData.replace(">IoMap.iom"," Reference=\"true\">" + '\\Physical\\' + ConfigToDuplicate + '\\' + ProcessorFolderPath + "\IoMap.iom")
+    FileData = FileData.replace(">PvMap.vvm"," Reference=\"true\">" + '\\Physical\\' + ConfigToDuplicate + '\\' + ProcessorFolderPath + "\PvMap.vvm")
+
+    with open(CpuPkgFilePath, 'w') as File:
+        FileData = File.write(FileData)
 
     # Create reference files for each configuration file by modifying .pkg files
+    for (Root, Dirs, Files) in os.walk(NewConfigPath):
+        for File in Files:
+            if(File.endswith(".pkg")):
+                AddReferencesToPkg(Root + "\\" + File, ConfigToDuplicate, ProcessorFolderPath)
 
     # Add new configuration to Physical folder .pkg file
 
