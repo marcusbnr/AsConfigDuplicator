@@ -9,8 +9,6 @@ Marcus Mangel <marcus.mangel@br-automation.com>
 import os
 import shutil
 
-######## Structure Declarations ########
-
 ######## Declare Functions ########
 
 # This funcntion reads a Package.pkg file and turns every "File" entry to a Reference entry
@@ -24,7 +22,8 @@ def AddReferencesToPkg(FilePath, OldConfigName, ProcessorFolderName):
     FileData = FileData.replace("Type=\"File\">", "Type=\"File\" Reference=\"true\">\\Physical\\" + OldConfigName + '\\' + ProcessorFolderName + "\\")
 
     with open(FilePath, 'w') as File:
-        FileData = File.write(FileData)
+        File.write(FileData)
+        File.close()
     return      
 
 ######## Main ########
@@ -102,7 +101,7 @@ def main():
     FileData = FileData.replace(">PvMap.vvm"," Reference=\"true\">" + '\\Physical\\' + ConfigToDuplicate + '\\' + ProcessorFolderPath + "\PvMap.vvm")
 
     with open(CpuPkgFilePath, 'w') as File:
-        FileData = File.write(FileData)
+        File.write(FileData)
 
     # Create reference files for each configuration file by modifying .pkg files
     for (Root, Dirs, Files) in os.walk(NewConfigPath):
@@ -111,6 +110,19 @@ def main():
                 AddReferencesToPkg(Root + "\\" + File, ConfigToDuplicate, ProcessorFolderPath)
 
     # Add new configuration to Physical folder .pkg file
+    PhysicalPkgFile = PhysicalDirectory + '\\' + 'Physical.pkg'
+    with open(PhysicalPkgFile, 'r') as File:
+        FileLines = File.readlines()
+
+    for Line in FileLines:
+        if("</Objects>" in Line):
+            LineIndex = FileLines.index(Line)
+            FileLines.insert(LineIndex, "    <Object Type=\"Configuration\">" + NewConfigName + "</Object>\n")  
+            break
+
+    File = open(PhysicalPkgFile, 'w')
+    File.writelines(FileLines)
+    File.close()
 
     # Done!
 
