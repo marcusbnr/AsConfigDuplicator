@@ -70,14 +70,15 @@ def main():
         print("Invalid Configuration path! ", OldConfigPath)
         return
     
+    # Modify new config name based on AS rules
+    NewConfigName = NewConfigName.replace(' ','') # Remove spaces
+
     # Check that the chosen New Configuration does not exist
     NewConfigPath = os.path.join(PhysicalDirectory, NewConfigName)
     NewConfigPath = NewConfigPath.replace('\\', '/')
     if os.path.exists(NewConfigPath):
         print("New Configuration already exists! ", NewConfigPath)
         return
-    
-    # To Do: Modify new config name based on AS rules ? Remove Spaces?
 
     # Create new Configuration folder
     print("Creating new Automation Studio Configuration at: ", NewConfigPath, "\n")
