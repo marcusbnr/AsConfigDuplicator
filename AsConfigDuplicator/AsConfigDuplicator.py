@@ -11,7 +11,7 @@ import shutil
 
 ######## Declare Functions ########
 
-# This funcntion reads a Package.pkg file and turns every "File" entry to a Reference entry
+# This function reads a Package.pkg file and turns every "File" entry to a Reference entry
 # Requires: The path to the pkg file, the name of the AS Configuration to Reference, the name of the processor folder in the Physical view
 # Modifies: Rewrites the pkg file
 # Returns: Nothing
@@ -19,7 +19,31 @@ def AddReferencesToPkg(FilePath, OldConfigName, ProcessorFolderName):
     with open(FilePath, 'r') as File:
         FileData = File.read()
 
-    FileData = FileData.replace("Type=\"File\">", "Type=\"File\" Reference=\"true\">\\Physical\\" + OldConfigName + '\\' + ProcessorFolderName + "\\")
+    # Get file path after Processor folder
+    DirString = FilePath.partition(ProcessorFolderName)
+    if DirString[2] != "": # Tuple: (StringBeforeSeperator, Seperator, StringAfterSeperator)
+        DirString = DirString[2]
+    else:
+        return
+    
+    # Get file path before filename
+    if "Package.pkg" in DirString:
+        DirString = DirString.partition("Package.pkg")
+        if DirString[0] != "": # Tuple: (StringBeforeSeperator, Seperator, StringAfterSeperator)
+            DirString = DirString[0]
+        else:
+            return
+    elif "Cpu.pkg" in DirString:
+        DirString = DirString.partition("Cpu.pkg")
+        if DirString[0] != "": # Tuple: (StringBeforeSeperator, Seperator, StringAfterSeperator)
+            DirString = DirString[0]
+        else:
+            return
+    else:
+        # Unknown package file
+        return
+
+    FileData = FileData.replace("Type=\"File\">", "Type=\"File\" Reference=\"true\">\\Physical\\" + OldConfigName + '\\' + ProcessorFolderName + DirString)
 
     with open(FilePath, 'w') as File:
         File.write(FileData)
@@ -30,9 +54,9 @@ def AddReferencesToPkg(FilePath, OldConfigName, ProcessorFolderName):
 
 def main():
     # Get information from user
-    AsProjectPath = "C:/ProjectsTemp/SuperTrakCore" #= input("Enter path to Automation Studio project (folder containing .apj file) ")
-    ConfigToDuplicate = "APC910" #= input("Enter the name of the Configuration you want to duplicate (name of the folder in the project directory) ")
-    NewConfigName = "PPC2100" #= input("Enter the name of the new configuration ")
+    AsProjectPath = input("Enter path to Automation Studio project (folder containing .apj file) ")
+    ConfigToDuplicate =  input("Enter the name of the Configuration you want to duplicate (name of the folder in the project directory) ")
+    NewConfigName = input("Enter the name of the new configuration ")
 
     # Check that project directory is valid (Contains a Physical directory)
     PhysicalDirectory = os.path.join(AsProjectPath, "Physical")
@@ -106,7 +130,8 @@ def main():
     # Create reference files for each configuration file by modifying .pkg files
     for (Root, Dirs, Files) in os.walk(NewConfigPath):
         for File in Files:
-            if(File.endswith(".pkg")):
+            if(File.endswith(".pkg") and File != "Config.pkg"):
+                File = File.replace('\\', '/')
                 AddReferencesToPkg(Root + "\\" + File, ConfigToDuplicate, ProcessorFolderPath)
 
     # Add new configuration to Physical folder .pkg file
