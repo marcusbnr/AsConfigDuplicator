@@ -133,10 +133,10 @@ def main():
         for File in Files:
             if(File.endswith(".pkg") and File != "Config.pkg"):
                 File = File.replace('\\', '/')
-                AddReferencesToPkg(Root + "\\" + File, ConfigToDuplicate, ProcessorFolderPath)
+                AddReferencesToPkg(Root + '/' + File, ConfigToDuplicate, ProcessorFolderPath)
 
     # Add new configuration to Physical folder .pkg file
-    PhysicalPkgFile = PhysicalDirectory + '\\' + 'Physical.pkg'
+    PhysicalPkgFile = PhysicalDirectory + '/' + 'Physical.pkg'
     with open(PhysicalPkgFile, 'r') as File:
         FileLines = File.readlines()
 
