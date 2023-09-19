@@ -2,7 +2,7 @@
 Duplicates an AS configuration and replaces config files with reference files in the new configuration
 
 ## Purpose
-Sometimes it is nessecary to create a duplicate configuration in an Automation Studio project which references an existing configuration. This new configuration can have different hardware (i.e. one configuration for simulation and one for the physical machine). However, manually replacing each new configuration file with a reference file can be very time consuming. The goal of this python script is to automate the process of creating a new reference configuration from an existing configuration.
+Sometimes it is necessary to create a duplicate configuration in an Automation Studio project which references an existing configuration. This new configuration can have different hardware (i.e. one configuration for simulation and one for the physical machine). However, manually replacing each new configuration file with a reference file can be very time consuming. The goal of this python script is to automate the process of creating a new reference configuration from an existing configuration.
 
 ## How To Use
 1. Place the script in the folder which also contains the AS project folder (this is not required but simplifies execution).
