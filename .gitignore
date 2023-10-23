@@ -5,3 +5,7 @@ venv/
 dist/
 *.egg-info/
 
+# Packaging Files
+src/
+*.toml
+
