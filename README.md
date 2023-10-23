@@ -17,5 +17,5 @@ Sometimes it is necessary to create a duplicate configuration in an Automation S
 * If the project is open when the script is run, it must be closed and re-opened to update the Configuration View
 
 ## Demonstration
-https://github.com/marcusbnr/AsConfigDuplicator/assets/103762819/115e53c5-7298-458d-82b9-a03b5eb08d79
+https://github.com/marcusbnr/AsConfigDuplicator/blob/main/AsConfigDuplication_DemoVideoFinal.mp4
 
