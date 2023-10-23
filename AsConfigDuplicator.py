@@ -1,6 +1,8 @@
 """
 AsConfigDuplicator main script
 
+Version 1.0.0
+
 Marcus Mangel <marcus.mangel@br-automation.com>
 
 """
