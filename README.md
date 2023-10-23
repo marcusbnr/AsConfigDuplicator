@@ -19,3 +19,5 @@ Sometimes it is necessary to create a duplicate configuration in an Automation S
 ## Demonstration
 https://github.com/marcusbnr/AsConfigDuplicator/blob/main/AsConfigDuplication_DemoVideoFinal.mp4
 
+https://github.com/marcusbnr/AsConfigDuplicator/assets/103762819/34bdef52-da55-49d5-8a37-160c41e5b2a4
+
