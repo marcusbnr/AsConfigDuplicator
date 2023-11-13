@@ -9,3 +9,6 @@ dist/
 src/
 *.toml
 
+# Documentation Video
+*.mp4
+
