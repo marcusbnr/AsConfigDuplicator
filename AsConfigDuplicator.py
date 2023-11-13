@@ -56,9 +56,9 @@ def AddReferencesToPkg(FilePath, OldConfigName, ProcessorFolderName):
 
 def main():
     # Get information from user
-    AsProjectPath = input("Enter path to Automation Studio project (folder containing .apj file) ")
-    ConfigToDuplicate =  input("Enter the name of the Configuration you want to duplicate (name of the folder in the project directory) ")
-    NewConfigName = input("Enter the name of the new configuration ")
+    AsProjectPath = input("Enter path to Automation Studio project (folder containing .apj file): ")
+    ConfigToDuplicate =  input("Enter the name of the Configuration you want to duplicate (name of the folder in the project directory): ")
+    NewConfigName = input("Enter the name of the new configuration: ")
 
     # Check that project directory is valid (Contains a Physical directory)
     PhysicalDirectory = os.path.join(AsProjectPath, "Physical")
@@ -69,7 +69,7 @@ def main():
     # Check that the chosen Configuration exists
     OldConfigPath = os.path.join(PhysicalDirectory, ConfigToDuplicate)
     if not os.path.exists(OldConfigPath):
-        print("Invalid Configuration path! ", OldConfigPath)
+        print("Invalid (source) configuration path! ", OldConfigPath)
         return
     
     # Modify new config name based on AS rules
@@ -79,7 +79,7 @@ def main():
     NewConfigPath = os.path.join(PhysicalDirectory, NewConfigName)
     NewConfigPath = NewConfigPath.replace('\\', '/')
     if os.path.exists(NewConfigPath):
-        print("New Configuration already exists! ", NewConfigPath)
+        print("New Configuration (path) already exists! ", NewConfigPath)
         return
 
     # Create new Configuration folder
@@ -91,13 +91,13 @@ def main():
         for Dir in Dirs:
             OldDirPath = Root + '/' + Dir
             OldDirPath = OldDirPath.replace('\\', '/')
-            NewDirPath = OldDirPath.replace(ConfigToDuplicate, NewConfigName)
+            NewDirPath = OldDirPath.replace(ConfigToDuplicate, NewConfigName, 1)
             os.mkdir(NewDirPath)
 
         for File in Files:
             if(File == "Package.pkg"):
                 OldFilePath = Root + '/' + File
-                NewFilePath = OldFilePath.replace(ConfigToDuplicate, NewConfigName)
+                NewFilePath = OldFilePath.replace(ConfigToDuplicate, NewConfigName, 1)
                 NewFilePath = NewFilePath.replace('\\', '/')
                 shutil.copy2(OldFilePath, NewFilePath)   
 
@@ -107,6 +107,7 @@ def main():
         # Hardware.hwl
         # Hardware.jpg
         # Cpu.pkg
+        # IoMap.iom
 
     shutil.copy2(OldConfigPath + "/Config.pkg", NewConfigPath)    
     shutil.copy2(OldConfigPath + "/Hardware.hw", NewConfigPath)  
@@ -116,6 +117,7 @@ def main():
     # For the Cpu.pkg file, we need the folder directly inside the config folder
     ProcessorFolderPath = next(os.walk(OldConfigPath))[1][0]
     shutil.copy2(OldConfigPath + '/' + ProcessorFolderPath + "/Cpu.pkg", NewConfigPath + '/' + ProcessorFolderPath)  
+    shutil.copy2(OldConfigPath + '/' + ProcessorFolderPath + "/IoMap.iom", NewConfigPath + '/' + ProcessorFolderPath)  
 
     # Modify Cpu.pkg file to reference CPU files
     CpuPkgFilePath = NewConfigPath + '/' + ProcessorFolderPath + "/Cpu.pkg"
@@ -124,7 +126,6 @@ def main():
 
     FileData = FileData.replace(">Cpu.sw"," Reference=\"true\">" + '\\Physical\\' + ConfigToDuplicate + '\\' + ProcessorFolderPath + "\Cpu.sw")
     FileData = FileData.replace(">Cpu.per"," Reference=\"true\">" + '\\Physical\\' + ConfigToDuplicate + '\\' + ProcessorFolderPath + "\Cpu.per")
-    FileData = FileData.replace(">IoMap.iom"," Reference=\"true\">" + '\\Physical\\' + ConfigToDuplicate + '\\' + ProcessorFolderPath + "\IoMap.iom")
     FileData = FileData.replace(">PvMap.vvm"," Reference=\"true\">" + '\\Physical\\' + ConfigToDuplicate + '\\' + ProcessorFolderPath + "\PvMap.vvm")
 
     with open(CpuPkgFilePath, 'w') as File:
