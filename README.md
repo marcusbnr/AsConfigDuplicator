@@ -11,11 +11,13 @@ Sometimes it is necessary to create a duplicate configuration in an Automation S
 4. Input the name of the configuration to be duplicated
 5. Input the name of the new configuration
 
+## What This Does
+1. Creates a new Automation Studio configuration with the specified name. The processor used will be the same as in the referenced existing configuration.
+2. References (rather than duplicates) all configuration files, except Config.pkg, Hardware.hw, Hardware.hwl, Hardware.jpg, Cpu.pkg, and IoMap.iom. These files are duplicated.
+
 ## Limitations
-* The .apj file and the project folder must have the same name (this is the default for any projects created with Automation Studio)
 * AS Configuration names cannot contain some special characters. It is up to the user to pick a name for the new configuration which matches AS rules
 * If the project is open when the script is run, it must be closed and re-opened to update the Configuration View
 
 ## Demonstration
 https://github.com/marcusbnr/AsConfigDuplicator/assets/103762819/34bdef52-da55-49d5-8a37-160c41e5b2a4
-
