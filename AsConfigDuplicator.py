@@ -18,9 +18,6 @@ import shutil
 # Modifies: Rewrites the pkg file
 # Returns: Nothing
 def AddReferencesToPkg(FilePath, OldConfigName, ProcessorFolderName):
-    with open(FilePath, 'r') as File:
-        FileData = File.read()
-
     # Get file path after Processor folder
     DirString = FilePath.partition(ProcessorFolderName)
     if DirString[2] != "": # Tuple: (StringBeforeSeperator, Seperator, StringAfterSeperator)
@@ -28,15 +25,9 @@ def AddReferencesToPkg(FilePath, OldConfigName, ProcessorFolderName):
     else:
         return
     
-    # Get file path before filename
+    # Get file path before filename (must not be empty)
     if "Package.pkg" in DirString:
         DirString = DirString.partition("Package.pkg")
-        if DirString[0] != "": # Tuple: (StringBeforeSeperator, Seperator, StringAfterSeperator)
-            DirString = DirString[0]
-        else:
-            return
-    elif "Cpu.pkg" in DirString:
-        DirString = DirString.partition("Cpu.pkg")
         if DirString[0] != "": # Tuple: (StringBeforeSeperator, Seperator, StringAfterSeperator)
             DirString = DirString[0]
         else:
@@ -44,13 +35,24 @@ def AddReferencesToPkg(FilePath, OldConfigName, ProcessorFolderName):
     else:
         # Unknown package file
         return
+    
+    # Read pkg file
+    with open(FilePath, 'r') as File:
+        FileData = File.readlines()
 
-    FileData = FileData.replace("Type=\"File\">", "Type=\"File\" Reference=\"true\">\\Physical\\" + OldConfigName + '\\' + ProcessorFolderName + DirString)
+    # Replace file names with paths ONLY for File object types
+    # These files may or may not have a Description field, but we do know the final two characters before the filename are ">
+    NewFileData = []
+    for Line in FileData:
+        if "<Object Type=\"File\"" in Line:
+            NewFileData.append(Line.replace("\">", "\" Reference=\"true\">\\Physical\\" + OldConfigName + '\\' + ProcessorFolderName + DirString))
+        else:
+            NewFileData.append(Line)
 
     with open(FilePath, 'w') as File:
-        File.write(FileData)
+        File.writelines(NewFileData)
         File.close()
-    return      
+    return
 
 ######## Main ########
 
